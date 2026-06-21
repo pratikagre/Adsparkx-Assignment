@@ -1,0 +1,25 @@
+# Python Virtual Environment
+venv/
+.venv/
+env/
+
+# Local configuration and API keys
+.env
+.env.*
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Local Vector Database
+chroma_db/
+
+# Streamlit config/cache
+.streamlit/
+
+# OS files
+.DS_Store
+Thumbs.db
