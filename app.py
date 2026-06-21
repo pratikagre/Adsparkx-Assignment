@@ -1,5 +1,7 @@
-import streamlit as st
 import os
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
+import streamlit as st
 import json
 import pandas as pd
 from pathlib import Path
