@@ -21,24 +21,20 @@ def evaluate_escalation(
     """
     reasons = []
 
-    # 1. Manual User Trigger
     if manual_trigger:
         reasons.append("User requested human agent.")
 
-    # 2. Check for Explicit Helpdesk/Human Agent request
     agent_keywords = [r"\bhuman\b", r"\blive agent\b", r"\blive support\b", r"\brepresentative\b", r"\bescalate\b", r"\btalk to a person\b"]
     for keyword in agent_keywords:
         if re.search(keyword, user_query.lower()):
             reasons.append("Explicit request for human support.")
             break
 
-    # 3. Check for Sensitive Keywords (Billing, Account Deletion, Legal)
     for kw in config.SENSITIVE_KEYWORDS:
         if kw.lower() in user_query.lower():
             reasons.append(f"Sensitive keyword detected: '{kw}'")
             break
 
-    # 4. Check Retrieval Confidence
     best_score = 0.0
     if context_chunks:
         best_score = max([c["score"] for c in context_chunks])
@@ -47,27 +43,21 @@ def evaluate_escalation(
     else:
         reasons.append("No relevant documentation found in knowledge base.")
 
-    # 5. Check Persistent Dissatisfaction
-    # Count consecutive Angry/Frustrated turns in the conversation history
     frustrated_count = 0
-    # Include latest turn
     if sentiment == "Angry/Frustrated":
         frustrated_count += 1
-    # Check history
     for msg in reversed(chat_history):
         if msg.get("role") == "user":
             user_sentiment = msg.get("sentiment", "Neutral")
             if user_sentiment == "Angry/Frustrated":
                 frustrated_count += 1
             else:
-                break  # Only count consecutive
+                break
                 
     if frustrated_count >= config.MAX_DISSATISFIED_TURNS:
         reasons.append(f"Persistent user dissatisfaction ({frustrated_count} consecutive turns).")
 
-    # If any reason triggers, escalate
     if reasons:
-        # Generate Handoff Summary
         handoff_summary = generate_handoff_summary(
             user_query=user_query,
             persona=persona,
@@ -100,18 +90,14 @@ def generate_handoff_summary(
 ) -> dict:
     """Compiles a detailed, structured JSON handoff data for an escalating support ticket."""
     
-    # Extract attempted steps by looking at previous assistant responses
     attempted_steps = []
     for msg in chat_history:
         if msg.get("role") == "assistant" and "response" in msg:
-            # Get first line or summarize response
             resp_summary = msg["response"].split("\n")[0][:60]
             attempted_steps.append(resp_summary)
 
-    # Format documents used
     documents_used = list(set([c["source"] for c in context_chunks])) if context_chunks else []
 
-    # Map recommended action based on reason
     reasons_str = "; ".join(escalation_reasons)
     if "billing" in reasons_str.lower() or "refund" in reasons_str.lower() or "charge" in reasons_str.lower():
         recommendation = "Verify customer invoice history and initiate billing refund/adjustment verification in Stripe admin."
@@ -124,7 +110,6 @@ def generate_handoff_summary(
     else:
         recommendation = "Analyze conversation history and troubleshoot the system integration error."
 
-    # Structured handoff payload
     handoff = {
         "persona": persona,
         "sentiment": sentiment,

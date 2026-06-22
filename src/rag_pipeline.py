@@ -7,7 +7,6 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 from dotenv import load_dotenv
 
-# Import config
 import src.config as config
 
 load_dotenv()
@@ -16,7 +15,6 @@ class LocalRAGPipeline:
     def __init__(self, db_dir=None):
         self.db_dir = db_dir or config.CHROMA_DIR
         self.chroma_client = chromadb.PersistentClient(path=str(self.db_dir))
-        # Use Cosine similarity space for better confidence calculations
         self.collection = self.chroma_client.get_or_create_collection(
             name="support_kb",
             metadata={"hnsw:space": "cosine"}
@@ -39,11 +37,9 @@ class LocalRAGPipeline:
                 model=config.EMBEDDING_MODEL,
                 contents=texts
             )
-            # Embeddings return values list
             return [embedding.values for embedding in response.embeddings]
         except Exception as e:
             print(f"Error generating embeddings: {e}")
-            # Fallback to zero vectors in case of API failure for local mock execution
             return [[0.0] * 768 for _ in texts]
 
     def get_embedding(self, text: str) -> list[float]:
@@ -80,7 +76,6 @@ class LocalRAGPipeline:
 
         print(f"Found {len(files)} files to ingest.")
         
-        # Reset the collection to prevent duplicate accumulation
         self.chroma_client.delete_collection("support_kb")
         self.collection = self.chroma_client.get_or_create_collection(
             name="support_kb",
@@ -92,14 +87,12 @@ class LocalRAGPipeline:
                 print(f"Processing {file_path.name}...")
                 content = self.parse_document(file_path)
                 
-                # Chunking strategy: 500 characters, 50 characters overlap
                 splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
                 chunks = splitter.split_text(content)
                 
                 if not chunks:
                     continue
 
-                # Generate embeddings in batches of 20 to avoid payload size errors
                 batch_size = 20
                 for i in range(0, len(chunks), batch_size):
                     batch_chunks = chunks[i:i+batch_size]
@@ -136,8 +129,6 @@ class LocalRAGPipeline:
         retrieved_items = []
         if results and results['documents'] and results['documents'][0]:
             for i in range(len(results['documents'][0])):
-                # In cosine space, Chroma distance = 1 - cosine_similarity.
-                # So Cosine Similarity = 1 - distance.
                 distance = results['distances'][0][i] if results['distances'] else 1.0
                 similarity_score = 1.0 - distance
                 
@@ -149,7 +140,6 @@ class LocalRAGPipeline:
         return retrieved_items
 
 if __name__ == "__main__":
-    # Test pipeline initialization
     print("Testing pipeline initialization...")
     pipeline = LocalRAGPipeline()
     print("Collection count:", pipeline.collection.count())

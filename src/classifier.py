@@ -4,13 +4,11 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
-# Load env variables
 load_dotenv()
 
 def get_genai_client():
     """Initializes the Gemini client using the environment variables."""
     api_key = os.environ.get("GEMINI_API_KEY")
-    # If API key is not set, we'll try to let client automatically load it (e.g. from environment)
     if api_key:
         return genai.Client(api_key=api_key)
     else:
@@ -58,7 +56,6 @@ def classify_customer_persona(user_message: str, chat_history: str = "") -> dict
         "required": ["persona", "sentiment", "urgency", "reasoning"]
     }
 
-    # Include chat history context if available to help maintain persona consistency
     input_content = user_message
     if chat_history:
         input_content = f"Chat History:\n{chat_history}\n\nLatest Customer Message:\n{user_message}"
@@ -76,7 +73,6 @@ def classify_customer_persona(user_message: str, chat_history: str = "") -> dict
         )
         return json.loads(response.text)
     except Exception as e:
-        # Fallback in case of API issues
         return {
             "persona": "Frustrated User" if "urgent" in user_message.lower() or "!" in user_message else "Technical Expert" if "api" in user_message.lower() or "code" in user_message.lower() else "Business Executive",
             "sentiment": "Neutral",
@@ -85,7 +81,6 @@ def classify_customer_persona(user_message: str, chat_history: str = "") -> dict
         }
 
 if __name__ == "__main__":
-    # Test classification
     test_msg = "Our production API key stopped working with a 401 Unauthorized block. Check our logs immediately."
     print("Testing classification with message:", test_msg)
     print(classify_customer_persona(test_msg))

@@ -22,7 +22,6 @@ def generate_adaptive_response(user_query: str, persona: str, context_chunks: li
     """
     client = get_genai_client()
 
-    # 1. Select persona-specific instructions
     if persona == "Technical Expert":
         persona_instructions = (
             "You are a Senior Technical Support Engineer at Adsparkx Cloud Services. "
@@ -40,7 +39,7 @@ def generate_adaptive_response(user_query: str, persona: str, context_chunks: li
             "numbered actions or bullet points so they are easy to read and execute. "
             "Reassure them that you are there to help them resolve this immediately."
         )
-    else:  # Business Executive
+    else:
         persona_instructions = (
             "You are a concise, outcome-focused Customer Success Director at Adsparkx Cloud Services. "
             "Your writing style is brief, highly professional, direct, and focused on business outcomes. "
@@ -50,7 +49,6 @@ def generate_adaptive_response(user_query: str, persona: str, context_chunks: li
             "or explain how we are addressing the business continuity aspect."
         )
 
-    # 2. Format context text
     if context_chunks:
         context_text = "\n\n".join(
             [f"--- Document: {chunk['source']} (Confidence Similarity Score: {chunk['score']}) ---\n{chunk['text']}" 
@@ -59,7 +57,6 @@ def generate_adaptive_response(user_query: str, persona: str, context_chunks: li
     else:
         context_text = "NO CONTEXT DOCUMENTS AVAILABLE."
 
-    # 3. Formulate the system instruction
     system_instruction = (
         f"{persona_instructions}\n\n"
         "CRITICAL BEHAVIOR RULES:\n"
@@ -72,7 +69,6 @@ def generate_adaptive_response(user_query: str, persona: str, context_chunks: li
         f"FACTUAL CONTEXT DOCUMENTS:\n{context_text}"
     )
 
-    # 4. Include chat history if available
     contents = []
     if chat_history:
         contents.append(types.Content(
@@ -88,7 +84,7 @@ def generate_adaptive_response(user_query: str, persona: str, context_chunks: li
             contents=contents,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
-                temperature=0.2  # Keep temperature low for facts/grounding
+                temperature=0.2
             )
         )
         return response.text

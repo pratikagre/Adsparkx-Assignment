@@ -1,11 +1,9 @@
 import os
 from pathlib import Path
 
-# Create data directory
 DATA_DIR = Path("data")
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-# 1. Generate text and markdown files
 documents = {
     "api_authentication.md": """# API Authentication Guide
 
@@ -223,7 +221,6 @@ Adsparkx allows multiple team members to collaborate on projects.
 """
 }
 
-# Write text/markdown files
 for filename, text in documents.items():
     file_path = DATA_DIR / filename
     with open(file_path, "w", encoding="utf-8") as f:
@@ -231,7 +228,6 @@ for filename, text in documents.items():
     print(f"Created {file_path}")
 
 
-# 2. Programmatically generate password_reset_guide.pdf using ReportLab
 pdf_path = DATA_DIR / "password_reset_guide.pdf"
 
 try:
@@ -245,7 +241,6 @@ try:
     
     styles = getSampleStyleSheet()
     
-    # Custom Styles
     title_style = ParagraphStyle(
         'PDFTitle',
         parent=styles['Heading1'],
@@ -287,14 +282,12 @@ try:
 
     story = []
     
-    # Title
     story.append(Paragraph("Account Security & Password Reset Guide", title_style))
     story.append(Spacer(1, 12))
     
     story.append(Paragraph("This document provides detailed guidelines for password recovery, two-factor authentication configuration, and standard account security policies at Adsparkx Cloud Services.", body_style))
     story.append(Spacer(1, 10))
     
-    # Section 1
     story.append(Paragraph("1. Password Reset Steps", heading_style))
     story.append(Paragraph("If you have forgotten your password or are locked out of your account, follow these exact steps to restore access:", body_style))
     story.append(Paragraph("&bull; <b>Step 1:</b> Navigate to the login portal and click the 'Forgot Password' link.", bullet_style))
@@ -304,7 +297,6 @@ try:
     story.append(Paragraph("&bull; <b>Step 5:</b> Choose a new secure password that meets our corporate security requirements.", bullet_style))
     story.append(Spacer(1, 10))
     
-    # Section 2
     story.append(Paragraph("2. Password Strength Requirements", heading_style))
     story.append(Paragraph("To ensure the safety of your cloud environment, your new password must comply with the following standards:", body_style))
     story.append(Paragraph("&bull; Must be at least <b>12 characters</b> in length.", bullet_style))
@@ -314,7 +306,6 @@ try:
     story.append(Paragraph("&bull; Must contain at least one special character (e.g., !, @, #, $, %, ^, &amp;, *).", bullet_style))
     story.append(Spacer(1, 10))
     
-    # Section 3
     story.append(Paragraph("3. Multi-Factor Authentication (MFA)", heading_style))
     story.append(Paragraph("We strongly recommend enabling MFA to protect your account. Go to Profile Settings > Security and scan the QR code with an authenticator app (such as Google Authenticator, Microsoft Authenticator, or Authy) to link it.", body_style))
     story.append(Paragraph("If you lose your MFA device, you must enter one of the 8-digit Recovery Codes provided during MFA initialization. If you do not have your recovery codes, you must contact support to initiate identity verification.", body_style))
@@ -323,6 +314,4 @@ try:
     print(f"Successfully generated PDF: {pdf_path}")
 
 except ImportError:
-    # If reportlab is not yet installed in the current python context (e.g. while installing in venv),
-    # we'll print a warning. The pip install will eventually install it and we can rerun this file.
     print("ReportLab not installed. The PDF will be generated later when running the setup script.")

@@ -4,10 +4,8 @@ import json
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Add project root to path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-# Import modules
 from src.classifier import classify_customer_persona
 from src.rag_pipeline import LocalRAGPipeline
 from src.generator import generate_adaptive_response
@@ -15,7 +13,6 @@ from src.escalator import evaluate_escalation
 
 load_dotenv()
 
-# Test queries from verification plan
 test_scenarios = [
     {
         "id": 1,
@@ -54,7 +51,6 @@ def run_tests():
     print("STARTING TEST RUN FOR PERSONA-ADAPTIVE AGENT")
     print("=" * 60)
 
-    # Initialize RAG
     print("Initializing RAG Pipeline and ingesting files...")
     rag = LocalRAGPipeline()
     
@@ -63,7 +59,6 @@ def run_tests():
         print("Knowledge base directory is empty. Run generate_kb.py first!")
         return
         
-    # Re-ingest
     rag.ingest_directory(kb_dir)
     print(f"Ingested documents. Total documents in DB collection: {rag.collection.count()}\n")
 
@@ -75,7 +70,6 @@ def run_tests():
         print(f"User Query: \"{query}\"")
         print("-" * 50)
         
-        # 1. Classification
         classification = classify_customer_persona(query)
         persona = classification.get("persona", "Frustrated User")
         sentiment = classification.get("sentiment", "Neutral")
@@ -87,14 +81,12 @@ def run_tests():
         print(f"Detected Urgency: {urgency}")
         print(f"Classification Reasoning: {reasoning}")
         
-        # 2. Retrieval
         context = rag.retrieve_context(query, top_k=2)
         print(f"Retrieved {len(context)} chunks:")
         for idx, chunk in enumerate(context):
             print(f"  [{idx+1}] Source: {chunk['source']} | Cosine Similarity Score: {chunk['score']}")
             print(f"      Snippet: {chunk['text'][:120]}...")
             
-        # 3. Escalation Check
         escalation = evaluate_escalation(
             user_query=query,
             persona=persona,
@@ -109,7 +101,6 @@ def run_tests():
             print("Structured Human Handoff JSON:")
             print(json.dumps(escalation["handoff_summary"], indent=2))
             
-            # Record escalated turn in history
             history.append({
                 "role": "user",
                 "text": query,
@@ -123,11 +114,9 @@ def run_tests():
             })
         else:
             print("\n>>> RESPONSE GENERATION...")
-            # 4. Generate response
             response = generate_adaptive_response(query, persona, context)
             print(f"Generated Response ({persona} style):\n{response}")
             
-            # Record turn in history
             history.append({
                 "role": "user",
                 "text": query,
