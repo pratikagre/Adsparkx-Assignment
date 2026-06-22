@@ -130,6 +130,10 @@ st.markdown("""
         padding: 1rem;
         margin-bottom: 1rem;
     }
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #20040a 0%, #170701 50%, #22020e 100%) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -171,8 +175,7 @@ except Exception as e:
     rag_pipeline = None
 
 with st.sidebar:
-    st.image("https://img.icons8.com/color/96/serverless.png", width=64)
-    st.title("Adsparkx Support Panel")
+    st.markdown("<div style='font-size: 2.2rem; font-weight: 800; margin-bottom: 1.5rem; background: linear-gradient(to right, #f87171, #fb923c, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>🛡️ Adsparkx Support</div>", unsafe_allow_html=True)
     st.markdown("---")
     
     st.subheader("⚙️ Config settings")
