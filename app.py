@@ -27,13 +27,13 @@ st.markdown("""
 <style>
     /* Styling elements */
     .stApp {
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        background: linear-gradient(135deg, #3b0712 0%, #2f1205 50%, #3b0726 100%);
         color: #f1f5f9;
     }
     .main-header {
         font-size: 2.5rem;
         font-weight: 800;
-        background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6);
+        background: linear-gradient(to right, #f87171, #fb923c, #f472b6);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
