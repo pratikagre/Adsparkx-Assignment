@@ -134,6 +134,18 @@ st.markdown("""
         background: linear-gradient(180deg, #20040a 0%, #170701 50%, #22020e 100%) !important;
         border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
+    [data-testid="stChatInput"] {
+        border: 1px solid rgba(236, 72, 153, 0.3) !important;
+        border-radius: 0.75rem !important;
+        background-color: rgba(30, 41, 59, 0.4) !important;
+    }
+    [data-testid="stChatInput"]:focus-within {
+        border-color: #fb923c !important;
+        box-shadow: 0 0 10px rgba(249, 115, 22, 0.3) !important;
+    }
+    [data-testid="stChatInput"] textarea {
+        color: #f1f5f9 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
